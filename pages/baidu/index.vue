@@ -22,6 +22,8 @@
 			</swiper-item>
 			<swiper-item>5
 			</swiper-item>
+			<swiper-item>6
+			</swiper-item>
 		</swiper>
 	</view>
 </template>
@@ -34,7 +36,7 @@
 		},
 		data() {
 			return {
-				tabBars:['商品','商品','商品','商品','商品'],
+				tabBars:['商品','商品','商品','商品','商品','商品','商品'],
 				tabCurrentIndex:-1,
 				sysWidth:0,
 				source:'touch',

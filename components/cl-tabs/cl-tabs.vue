@@ -1,11 +1,19 @@
 <template>
 	<view>
 		<view class="tabs">
-			<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
-				<view :animation="animationData[index]" class="title">{{item}}</view>
-			</view>
-			<view class="slider" :animation="animationSlider" ref="slider" id="slider"></view>
-			<view class="slider" :animation="animationSliderRight" ref="sliderRight" id="sliderRight"></view>
+			<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" 
+				:scroll-into-view="scrollInto">
+				
+				<view style="flex-direction: row;display: flex;">
+					<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
+						<view :animation="animationData[index]" class="title">{{item}}</view>
+					</view>
+				</view>
+			
+				<view class="slider" :animation="animationSlider" ref="slider" id="slider"></view>
+				<view class="slider" :animation="animationSliderRight" ref="sliderRight" id="sliderRight"></view>
+			</scroll-view>
+			<view class="tab-bar-line"></view>
 		</view>
 	</view>
 	
@@ -40,6 +48,7 @@
 				sliderRight:0,
 				sliderWidth:0,//滑块宽度
 				sliderMove:0,//滑块移动距离
+				scrollInto:''
 			}
 		},
 		created() {
@@ -189,23 +198,39 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tabs{
 	display: flex;
 	flex-direction: row;
-	padding: 20rpx;
+	padding: 20rpx 0;
 	align-items: center;
 	position: relative;
 }
 .tab{
-	position: relative;
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin:20rpx 20rpx;
-	width: 50px;
+	white-space: nowrap;
+	padding-left: 20px;
+	padding-right: 20px;
 	font-size: 16px;
 	z-index: 99;
+	flex:1;
+}
+.tab-bar{
+	width: 750upx;
+	height: 84upx;
+	
+
+}
+.tab-bar ::-webkit-scrollbar {
+	display: none;
+	width: 0 !important;  
+	height: 0 !important;  
+	-webkit-appearance: none;  
+	background: transparent;  
+}
+.tab-bar-line {
+	height: 1upx;
+	background-color: #fff;
 }
 .slider{
 	position: absolute;
