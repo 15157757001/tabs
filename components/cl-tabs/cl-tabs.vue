@@ -1,13 +1,18 @@
 <template>
-	<view>
-		<view class="tabs">
-			<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
-				<view :animation="animationData[index]" class="title">{{item}}</view>
+	<view class="tabs">
+		<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" 
+			:scroll-into-view="scrollInto" @scroll="scroll">
+			<view class="scroll-box">
+				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
+					<view :animation="animationData[index]" class="title" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
+				</view>
+				<block v-if="type!='default'">
+					<view :class="[type]" :animation="animationSliderLeft" ref="slider" id="slider" :style="{backgroundColor:sliderColor}"></view>
+					<view :class="[type]" :animation="animationSliderRight" ref="sliderRight" id="sliderRight" :style="{backgroundColor:sliderColor}"></view>
+				</block>
 			</view>
-			<view class="slider" :animation="animationSliderLeft" ref="slider" id="slider"></view>
-			
-			<view class="slider" :animation="animationSliderRight" ref="sliderRight" id="sliderRight"></view>
-		</view>
+		</scroll-view>
+		
 	</view>
 	
 </template>
@@ -24,10 +29,26 @@
 				type: Number,
 				default: -1
 			},
-			scale: {
+			scale: { //放大倍数
 				type: Number,
-				default: 1.3
+				default: 1
 			},
+			type: { //类型fill文字被包含 float文字上浮
+				type: String,
+				default: 'default'
+			},
+			sliderColor: { //滑块颜色
+				type: String,
+				default: '#ff461f'
+			},
+			textColor: { //字体颜色
+				type: String,
+				default: 'black'
+			},
+			selectColor:{ //选中字体颜色
+				type: String,
+				default: 'black'
+			}
 		},
 		data(){
 			return{
@@ -43,6 +64,8 @@
 				sliderRight:0,
 				sliderWidth:0,//滑块宽度
 				sliderMove:0,//滑块移动距离
+				scrollInto:'',
+				scrollLeft:0
 			}
 		},
 		created() {
@@ -52,8 +75,10 @@
 			//滑块动画
 			this.sliderAni = uni.createAnimation({duration:0});
 			this.sliderAniRight = uni.createAnimation({duration:0});
-			this.sliderAniEnd = uni.createAnimation({duration:50});
-			this.sliderAniRightEnd = uni.createAnimation({duration:50});
+			this.sliderAniEnd = uni.createAnimation({duration:80});
+			this.sliderAniRightEnd = uni.createAnimation({duration:80});
+			this.sliderAniRightQuick = uni.createAnimation({duration:0});
+			this.sliderAniQuick = uni.createAnimation({duration:0});
 		},
 		mounted() {
 			
@@ -66,6 +91,10 @@
 					},time)
 				})
 				return promise
+			},
+			scroll({detail}){
+				this.scrollLeft = detail.scrollLeft
+				this.reset(this.tabIndex,this.tabIndex)
 			},
 			//点击
 			async tapTab(index){
@@ -80,6 +109,7 @@
 						this.animationData[this.tabIndex] = this.largeAni.export()
 					}
 				}
+				this.reset(this.tabIndex,this.tabIndex)
 			},
 			//触摸
 			move(dx){
@@ -93,21 +123,18 @@
 				if(this.tabIndex+ratio>=this.tabBars.length-1||this.tabIndex+ratio<=0) return
 				
 				if(ratio<0){
-					this.sliderAni.width(this.sliderWidth).step()
+					this.sliderAni.left(this.sliderLeft+this.scrollLeft).width(this.sliderWidth).step()
 					this.animationSliderLeft = this.sliderAni.export()
 					
-					this.sliderAniRight.right(sysWidth-this.sliderRight).step()
-					this.animationSliderRight = this.sliderAniRight.export()
-					this.sliderAniRight.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					this.sliderAniRight.right(sysWidth-this.sliderRight-this.scrollLeft).width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
 					this.animationSliderRight = this.sliderAniRight.export()
 
 				}else if(ratio>0){
-					this.sliderAniRight.width(this.sliderWidth).step()
+					this.sliderAniRight.right(sysWidth-this.sliderRight-this.scrollLeft).width(this.sliderWidth).step()
 					this.animationSliderRight = this.sliderAniRight.export()
 					
-					this.sliderAni.left(this.sliderLeft).step()
-					this.animationSliderLeft = this.sliderAniRight.export()
-					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					
+					this.sliderAni.left(this.sliderLeft+this.scrollLeft).width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
 					this.animationSliderLeft = this.sliderAni.export()
 					
 				}
@@ -117,16 +144,18 @@
 				
 				let scale = this.scale+(1-this.scale)*(Math.abs(yRatio)) < 1 ? 1:this.scale+(1-this.scale)*(Math.abs(yRatio))
 				
-				if(yRatio==0) return
-				//复原
-				this.largeAni.scale( scale ).step()
-				this.animationData[currentIndex-(ratio>0?1:-1)] = this.largeAni.export()
+				if(yRatio!=0){
+					//复原
+					this.largeAni.scale( scale ).step()
+					this.animationData[currentIndex-(ratio>0?1:-1)] = this.largeAni.export()
+					
+					
+					scale = 1-(1-this.scale)*(Math.abs(yRatio))>this.scale ? this.scale:1-(1-this.scale)*(Math.abs(yRatio))
+					//放大
+					this.largeAni.scale( scale ).step()
+					this.animationData[currentIndex] = this.largeAni.export()
+				}
 				
-				
-				scale = 1-(1-this.scale)*(Math.abs(yRatio))>this.scale ? this.scale:1-(1-this.scale)*(Math.abs(yRatio))
-				//放大
-				this.largeAni.scale( scale ).step()
-				this.animationData[currentIndex] = this.largeAni.export()
 				
 			},
 			reset(newVal,oldVal){
@@ -141,32 +170,40 @@
 					this.sliderMove = (tabData[0].left-tabData[0].width*this.tabIndex)/(2*this.tabIndex+1)*2+tabData[0].width
 					
 					if(newVal>oldVal){
-						
-						
-						this.sliderAniEnd.left(tabData[0].left).width(tabData[0].width).step()
-						this.animationSliderLeft = this.sliderAniEnd.export()
-						
-						this.sliderAniRight.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAniRight.export()
-						await this.promise(50)
-						this.sliderAni.left(tabData[0].left).width(tabData[0].width).step()
+						this.sliderAni.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
 						this.animationSliderLeft = this.sliderAni.export()
-					
+						
+						this.sliderAniRight.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAniRight.export()
+						// await this.promise(80)
+						// this.sliderAni.width(tabData[0].width).step()
+						// this.animationSliderLeft = this.sliderAni.export()
+						// this.sliderAniRightEnd.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
+						// this.animationSliderRight = this.sliderAniRightEnd.export()
 					}else if(newVal<oldVal){
 						
 						
-						this.sliderAniRightEnd.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAniRightEnd.export()
+						this.sliderAniRight.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAniRight.export()
 					
-						this.sliderAni.left(tabData[0].left).width(tabData[0].width).step()
+						this.sliderAni.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
 						this.animationSliderLeft = this.sliderAni.export()
 					
-						await this.promise(50)
-						this.sliderAniRight.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAni.export()
+						// await this.promise(80)
+						// this.sliderAniRight.width(tabData[0].width).step()
+						// this.animationSliderRight = this.sliderAni.export()
+						// this.sliderAniEnd.left(tabData[0].left).width(tabData[0].width).step()
+						// this.animationSliderLeft = this.sliderAniEnd.export()
+					}else if(newVal==oldVal){
+						this.sliderAniRightQuick.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAniRightQuick.export()
+											
+						this.sliderAniQuick.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
+						this.animationSliderLeft = this.sliderAniQuick.export()
 					}
+					if(this.type=='default') return
 					await this.promise()
-						
+					
 					let dom = uni.createSelectorQuery().in(this)
 					dom.select("#slider").boundingClientRect()
 					dom.exec((domData) => {
@@ -191,17 +228,17 @@
 			},
 			tabIndex:{
 				handler:async function(newVal,oldVal){
-					if(oldVal==-1){
-						for (let key in this.animationData) {
-							if(key!=this.tabIndex){
-								this.largeAni.scale( 1 ).step()
-								this.animationData[key] = this.largeAni.export()
-							}else{
-								this.largeAni.scale( this.scale ).step()
-								this.animationData[this.tabIndex] = this.largeAni.export()
-							}
+					
+					for (let key in this.animationData) {
+						if(key!=this.tabIndex){
+							this.largeAni.scale( 1 ).step()
+							this.animationData[key] = this.largeAni.export()
+						}else{
+							this.largeAni.scale( this.scale ).step()
+							this.animationData[this.tabIndex] = this.largeAni.export()
 						}
 					}
+					await this.promise()
 					
 					this.reset(newVal,oldVal)
 					
@@ -211,30 +248,42 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tabs{
 	display: flex;
 	flex-direction: row;
-	padding: 20rpx;
+	padding: 20rpx 0;
 	align-items: center;
-	position: relative;
 }
 .tab{
-	position: relative;
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin:20rpx 20rpx;
-	width: 50px;
+	white-space: nowrap;
+
+	padding: 10rpx 20px;
 	font-size: 16px;
 	z-index: 99;
 }
-.slider{
+.tab-bar{
+	width: 750upx;
+	height: 84upx;
+	
+
+}
+.scroll-box{
+	flex-direction: row;
+	display: flex;
+	position: relative;
+}
+.float{
 	position: absolute;
-	bottom: 30rpx;
-	background-color: #FFF82B;
-	width: 50px;
+	bottom: 0;
 	height: 20rpx;
 	border-radius: 10rpx;
+}
+.fill{
+	position: absolute;
+	bottom: 10rpx;
+	height: 44rpx;
+	border-radius: 20rpx;
 }
 </style>
