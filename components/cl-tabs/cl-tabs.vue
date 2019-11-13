@@ -4,7 +4,8 @@
 			<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
 				<view :animation="animationData[index]" class="title">{{item}}</view>
 			</view>
-			<view class="slider" :animation="animationSlider" ref="slider" id="slider"></view>
+			<view class="slider" :animation="animationSliderLeft" ref="slider" id="slider"></view>
+			
 			<view class="slider" :animation="animationSliderRight" ref="sliderRight" id="sliderRight"></view>
 		</view>
 	</view>
@@ -30,11 +31,13 @@
 		},
 		data(){
 			return{
-				animationSlider:{},
 				animationData:{},
 				largeAni:null,
 				sliderAni:null,
 				sliderAniRight:null,
+				sliderAniEnd:null,
+				sliderAniRightEnd:null,
+				animationSliderLeft:{},
 				animationSliderRight:{},
 				sliderLeft:0,
 				sliderRight:0,
@@ -45,28 +48,22 @@
 		created() {
 			
 			//放大动画
-			this.largeAni = uni.createAnimation({
-				duration:0
-			});
+			this.largeAni = uni.createAnimation({duration:0});
 			//滑块动画
-			this.sliderAni = uni.createAnimation({
-				duration:0,
-				transformOrigin:"50 50 0"
-			});
-			this.sliderAniRight = uni.createAnimation({
-				duration:0,
-				transformOrigin:"50 50 0"
-			});
+			this.sliderAni = uni.createAnimation({duration:0});
+			this.sliderAniRight = uni.createAnimation({duration:0});
+			this.sliderAniEnd = uni.createAnimation({duration:50});
+			this.sliderAniRightEnd = uni.createAnimation({duration:50});
 		},
 		mounted() {
 			
 		},
 		methods:{
-			promise(){
+			promise(time=0){
 				let promise = new Promise((resolve,reject)=>{
 					setTimeout(()=>{
 						resolve()
-					},0)
+					},time)
 				})
 				return promise
 			},
@@ -96,15 +93,23 @@
 				if(this.tabIndex+ratio>=this.tabBars.length-1||this.tabIndex+ratio<=0) return
 				
 				if(ratio<0){
+					this.sliderAni.width(this.sliderWidth).step()
+					this.animationSliderLeft = this.sliderAni.export()
+					
 					this.sliderAniRight.right(sysWidth-this.sliderRight).step()
 					this.animationSliderRight = this.sliderAniRight.export()
 					this.sliderAniRight.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
 					this.animationSliderRight = this.sliderAniRight.export()
-				}else{
+
+				}else if(ratio>0){
+					this.sliderAniRight.width(this.sliderWidth).step()
+					this.animationSliderRight = this.sliderAniRight.export()
+					
 					this.sliderAni.left(this.sliderLeft).step()
-					this.animationSlider = this.sliderAni.export()
+					this.animationSliderLeft = this.sliderAniRight.export()
 					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
-					this.animationSlider = this.sliderAni.export()
+					this.animationSliderLeft = this.sliderAni.export()
+					
 				}
 				
 				//取到结果值
@@ -124,7 +129,7 @@
 				this.animationData[currentIndex] = this.largeAni.export()
 				
 			},
-			reset(){
+			reset(newVal,oldVal){
 				
 				
 				let tab = uni.createSelectorQuery().in(this)
@@ -135,24 +140,41 @@
 					//滑块移动距离
 					this.sliderMove = (tabData[0].left-tabData[0].width*this.tabIndex)/(2*this.tabIndex+1)*2+tabData[0].width
 					
-					this.sliderAni.left(tabData[0].left).step()
-					this.animationSlider = this.sliderAni.export()
-					this.sliderAni.width(tabData[0].width).step()
-					this.animationSlider = this.sliderAni.export()
+					if(newVal>oldVal){
+						
+						
+						this.sliderAniEnd.left(tabData[0].left).width(tabData[0].width).step()
+						this.animationSliderLeft = this.sliderAniEnd.export()
+						
+						this.sliderAniRight.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAniRight.export()
+						await this.promise(50)
+						this.sliderAni.left(tabData[0].left).width(tabData[0].width).step()
+						this.animationSliderLeft = this.sliderAni.export()
 					
-					this.sliderAniRight.right(sysWidth-tabData[0].right).step()
-					this.animationSliderRight = this.sliderAniRight.export()
-					this.sliderAniRight.width(tabData[0].width).step()
-					this.animationSliderRight = this.sliderAniRight.export()
+					}else if(newVal<oldVal){
+						
+						
+						this.sliderAniRightEnd.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAniRightEnd.export()
+					
+						this.sliderAni.left(tabData[0].left).width(tabData[0].width).step()
+						this.animationSliderLeft = this.sliderAni.export()
+					
+						await this.promise(50)
+						this.sliderAniRight.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
+						this.animationSliderRight = this.sliderAni.export()
+					}
 					await this.promise()
-					
+						
 					let dom = uni.createSelectorQuery().in(this)
 					dom.select("#slider").boundingClientRect()
 					dom.exec((domData) => {
 						this.sliderLeft = domData[0].left
 						this.sliderRight = domData[0].right
-						
+							
 					})
+					
 				})
 			}
 		},
@@ -180,8 +202,8 @@
 							}
 						}
 					}
-					await this.promise()
-					this.reset()
+					
+					this.reset(newVal,oldVal)
 					
 				}
 			},
