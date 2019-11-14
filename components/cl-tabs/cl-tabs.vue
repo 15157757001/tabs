@@ -1,14 +1,13 @@
 <template>
 	<view class="tabs">
 		<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" 
-			:scroll-into-view="scrollInto" @scroll="scroll">
-			<view class="scroll-box">
+			:scroll-into-view="scrollInto">
+			<view class="tab-box" id="scroll-box">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
 					<view :animation="animationData[index]" class="title" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
 				</view>
 				<block v-if="type!='default'">
-					<view :class="[type]" :animation="animationSliderLeft" ref="slider" id="slider" :style="{backgroundColor:sliderColor}"></view>
-					<view :class="[type]" :animation="animationSliderRight" ref="sliderRight" id="sliderRight" :style="{backgroundColor:sliderColor}"></view>
+					<view :class="[type]" :animation="animationSlider" ref="slider" id="slider" :style="sliderBgColor+sliderPosition"></view>
 				</block>
 			</view>
 		</scroll-view>
@@ -55,17 +54,15 @@
 				animationData:{},
 				largeAni:null,
 				sliderAni:null,
-				sliderAniRight:null,
 				sliderAniEnd:null,
-				sliderAniRightEnd:null,
-				animationSliderLeft:{},
-				animationSliderRight:{},
+				animationSlider:{},
 				sliderLeft:0,
 				sliderRight:0,
 				sliderWidth:0,//滑块宽度
 				sliderMove:0,//滑块移动距离
 				scrollInto:'',
-				scrollLeft:0
+				pos:0,
+				direction:1
 			}
 		},
 		created() {
@@ -74,11 +71,7 @@
 			this.largeAni = uni.createAnimation({duration:0});
 			//滑块动画
 			this.sliderAni = uni.createAnimation({duration:0});
-			this.sliderAniRight = uni.createAnimation({duration:0});
 			this.sliderAniEnd = uni.createAnimation({duration:80});
-			this.sliderAniRightEnd = uni.createAnimation({duration:80});
-			this.sliderAniRightQuick = uni.createAnimation({duration:0});
-			this.sliderAniQuick = uni.createAnimation({duration:0});
 		},
 		mounted() {
 			
@@ -92,24 +85,19 @@
 				})
 				return promise
 			},
-			scroll({detail}){
-				this.scrollLeft = detail.scrollLeft
-				this.reset(this.tabIndex,this.tabIndex)
+			getDataByEl(el){
+				let promise = new Promise((resolve,reject)=>{
+					let tab = uni.createSelectorQuery().in(this)
+					tab.select(el).boundingClientRect()
+					tab.exec(async (tabData) => {
+						resolve(tabData[0])
+					})
+				})
+				return promise
 			},
 			//点击
 			async tapTab(index){
 				this.$emit('tabChange',index)
-				await this.promise()
-				for (let key in this.animationData) {
-					if(key!=this.tabIndex){
-						this.largeAni.scale( 1 ).step()
-						this.animationData[key] = this.largeAni.export()
-					}else{
-						this.largeAni.scale( this.scale ).step()
-						this.animationData[this.tabIndex] = this.largeAni.export()
-					}
-				}
-				this.reset(this.tabIndex,this.tabIndex)
 			},
 			//触摸
 			move(dx){
@@ -123,20 +111,15 @@
 				if(this.tabIndex+ratio>=this.tabBars.length-1||this.tabIndex+ratio<=0) return
 				
 				if(ratio<0){
-					this.sliderAni.left(this.sliderLeft+this.scrollLeft).width(this.sliderWidth).step()
-					this.animationSliderLeft = this.sliderAni.export()
-					
-					this.sliderAniRight.right(sysWidth-this.sliderRight-this.scrollLeft).width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
-					this.animationSliderRight = this.sliderAniRight.export()
-
+					this.direction = -1
+					this.pos = sysWidth - this.sliderRight
+					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					this.animationSlider = this.sliderAni.export()
 				}else if(ratio>0){
-					this.sliderAniRight.right(sysWidth-this.sliderRight-this.scrollLeft).width(this.sliderWidth).step()
-					this.animationSliderRight = this.sliderAniRight.export()
-					
-					
-					this.sliderAni.left(this.sliderLeft+this.scrollLeft).width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
-					this.animationSliderLeft = this.sliderAni.export()
-					
+					this.direction = 1
+					this.pos = this.sliderLeft
+					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					this.animationSlider = this.sliderAni.export()
 				}
 				
 				//取到结果值
@@ -158,61 +141,35 @@
 				
 				
 			},
-			reset(newVal,oldVal){
+			async reset(newVal,oldVal){
 				
+				let res = await this.getDataByEl('#scroll-box')
 				
-				let tab = uni.createSelectorQuery().in(this)
-				tab.select(`#tab_${this.tabIndex}`).boundingClientRect()
-				tab.exec(async (tabData) => {
+				let tabData = await this.getDataByEl(`#tab_${this.tabIndex}`)
+			
+				this.sliderLeft = tabData.left - res.left
+				this.sliderRight = tabData.right - res.left
+				this.sliderWidth = tabData.width
+				//滑块移动距离
+				this.sliderMove = (tabData.left-tabData.width*this.tabIndex)/(2*this.tabIndex+1)*2+tabData.width
+				if(oldVal==-1){
+					this.pos = this.sliderLeft
+					return
+				}
+				if(newVal>oldVal){
+					this.direction = -1
+					this.pos = sysWidth - this.sliderRight 
+					this.sliderAniEnd.width(tabData.width).step()
+					this.animationSlider = this.sliderAniEnd.export()
+				}else if(newVal<oldVal){
+					this.direction = 1
+					this.pos = this.sliderLeft
+					this.sliderAniEnd.width(tabData.width).step()
+					this.animationSlider = this.sliderAniEnd.export()
+				}
 					
-					this.sliderWidth = tabData[0].width
-					//滑块移动距离
-					this.sliderMove = (tabData[0].left-tabData[0].width*this.tabIndex)/(2*this.tabIndex+1)*2+tabData[0].width
 					
-					if(newVal>oldVal){
-						this.sliderAni.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderLeft = this.sliderAni.export()
-						
-						this.sliderAniRight.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAniRight.export()
-						// await this.promise(80)
-						// this.sliderAni.width(tabData[0].width).step()
-						// this.animationSliderLeft = this.sliderAni.export()
-						// this.sliderAniRightEnd.right(sysWidth-tabData[0].right).width(tabData[0].width).step()
-						// this.animationSliderRight = this.sliderAniRightEnd.export()
-					}else if(newVal<oldVal){
-						
-						
-						this.sliderAniRight.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAniRight.export()
-					
-						this.sliderAni.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderLeft = this.sliderAni.export()
-					
-						// await this.promise(80)
-						// this.sliderAniRight.width(tabData[0].width).step()
-						// this.animationSliderRight = this.sliderAni.export()
-						// this.sliderAniEnd.left(tabData[0].left).width(tabData[0].width).step()
-						// this.animationSliderLeft = this.sliderAniEnd.export()
-					}else if(newVal==oldVal){
-						this.sliderAniRightQuick.right(sysWidth-tabData[0].right-this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderRight = this.sliderAniRightQuick.export()
-											
-						this.sliderAniQuick.left(tabData[0].left+this.scrollLeft).width(tabData[0].width).step()
-						this.animationSliderLeft = this.sliderAniQuick.export()
-					}
-					if(this.type=='default') return
-					await this.promise()
-					
-					let dom = uni.createSelectorQuery().in(this)
-					dom.select("#slider").boundingClientRect()
-					dom.exec((domData) => {
-						this.sliderLeft = domData[0].left
-						this.sliderRight = domData[0].right
-							
-					})
-					
-				})
+			
 			}
 		},
 		watch:{
@@ -228,7 +185,7 @@
 			},
 			tabIndex:{
 				handler:async function(newVal,oldVal){
-					
+					this.scrollInto = `tab_${newVal}`
 					for (let key in this.animationData) {
 						if(key!=this.tabIndex){
 							this.largeAni.scale( 1 ).step()
@@ -244,6 +201,16 @@
 					
 				}
 			},
+		},
+		computed:{
+			sliderBgColor(){
+				return `background-color:${this.sliderColor};width:${this.sliderWidth}px;`
+			},
+			sliderPosition(){
+				let pos = this.direction > 0?`left:${this.pos}px;`:`right:${this.pos}px;`
+				
+				return pos
+			}
 		}
 	}
 </script>
@@ -269,20 +236,22 @@
 	
 
 }
-.scroll-box{
+.tab-box{
 	flex-direction: row;
 	display: flex;
 	position: relative;
+	align-items: center;
 }
 .float{
 	position: absolute;
 	bottom: 0;
+	
 	height: 20rpx;
 	border-radius: 10rpx;
 }
 .fill{
 	position: absolute;
-	bottom: 10rpx;
+	
 	height: 44rpx;
 	border-radius: 20rpx;
 }

@@ -32,7 +32,7 @@
 		},
 		data() {
 			return {
-				tabBars:['商品','商品','商品','商品','商品','商品'],
+				tabBars:['最新','新闻','图片','视频','推荐','收藏'],
 				tabCurrentIndex:-1,
 				sysWidth:0,
 				source:'touch',
@@ -75,12 +75,10 @@
 				}
 			},
 			animationfinish(e){
+				
 				this.fristTouch = false
 				this.source = 'touch'
 				this.tabCurrentIndex = e.detail.current
-				//this.$refs.tabs0.reset()
-				this.$refs.tabs1.reset()
-				//this.$refs.tabs2.reset()
 			}
 		}
 	}
