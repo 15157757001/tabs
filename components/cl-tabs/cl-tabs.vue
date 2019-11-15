@@ -1,7 +1,6 @@
 <template>
 	<view class="tabs">
-		<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" 
-			:scroll-into-view="scrollInto">
+		<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="scroll-box">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
 					<view :animation="animationData[index]" class="title" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
@@ -217,6 +216,7 @@
 
 <style lang="scss" scoped>
 .tabs{
+	width: 750rpx;
 	display: flex;
 	flex-direction: row;
 	padding: 20rpx 0;
@@ -231,7 +231,7 @@
 	z-index: 99;
 }
 .tab-bar{
-	width: 750upx;
+	width: 749rpx;
 	height: 84upx;
 	
 

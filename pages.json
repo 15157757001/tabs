@@ -6,6 +6,20 @@
 				"navigationBarTitleText": "uni-app"
 				
 			}
+		},
+		{
+			"path": "pages/index1/index",
+			"style": {
+				"navigationBarTitleText": "uni-app"
+				
+			}
+		},
+		{
+			"path": "pages/index2/index",
+			"style": {
+				"navigationBarTitleText": "uni-app"
+				
+			}
 		}
 	],
 	"globalStyle": {
@@ -13,5 +27,30 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#333333",
+		"backgroundColor": "#F8F8F8",
+		"selectedColor": "#00B26A",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "缩放"
+			},
+			{
+				"pagePath": "pages/index1/index",
+				"text": "上浮"
+			},
+			{
+				"pagePath": "pages/index2/index",
+				"text": "吞噬"
+			}
+		]
 	}
 }

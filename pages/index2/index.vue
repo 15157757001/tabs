@@ -1,10 +1,8 @@
 <template>
 	<view class="content">
-		
-		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange"
-			:scale="1.3" ref="tabs0">
+		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" 
+			type="fill" sliderColor="#E6FAFF" selectColor="#0cC5FD" ref="tabs2" class="tabs">
 		</cl-tabs>
-		
 		
 		<swiper 
 			class="swiper" 
@@ -61,9 +59,9 @@
 					
 				}else{
 					if(this.fristTouch){
-						this.$refs.tabs0.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
+						this.$refs.tabs2.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
 					}else{
-						this.$refs.tabs0.move(e.detail.dx)
+						this.$refs.tabs2.move(e.detail.dx)
 					}
 				}
 			},
