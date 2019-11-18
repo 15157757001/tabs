@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" 
+		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" :sliderMargin="20"
 			type="fill" sliderColor="#E6FAFF" selectColor="#0cC5FD" ref="tabs2" class="tabs">
 		</cl-tabs>
 		
@@ -27,7 +27,7 @@
 		},
 		data() {
 			return {
-				tabBars:['最新','新闻','图片','视频','推荐','收藏'],
+				tabBars:['最新','新闻','图片','视频','推荐','收藏','关注'],
 				tabCurrentIndex:-1,
 				sysWidth:0,
 				source:'touch',
@@ -78,8 +78,8 @@
 <style scoped>
 
 .swiper{
-	
-	height: 700px;
+	background-color: #F1F1F1;
+	height: 600rpx;
 }
 	
 </style>

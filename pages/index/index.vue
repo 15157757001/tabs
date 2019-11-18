@@ -29,7 +29,7 @@
 		},
 		data() {
 			return {
-				tabBars:['最新','新闻','图片','视频','推荐','收藏'],
+				tabBars:['最新','新闻','图片','视频','推荐','收藏','关注'],
 				tabCurrentIndex:-1,
 				sysWidth:0,
 				source:'touch',
@@ -44,7 +44,7 @@
 		},
 		mounted() {
 			
-			this.tabCurrentIndex = 1
+			this.tabCurrentIndex = 0
 		},
 		methods: {
 			tabChange(e){
@@ -80,8 +80,8 @@
 <style scoped>
 
 .swiper{
-	
-	height: 700px;
+	background-color: #F1F1F1;
+	height: 600px;
 }
 	
 </style>

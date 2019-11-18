@@ -1,9 +1,10 @@
 <template>
 	<view class="tabs">
-		<scroll-view class="tab-bar" :scroll="false" scroll-x :show-scrollbar="false" :scroll-into-view="scrollInto">
+		<scroll-view class="tab-bar" :scroll="false" scroll-x
+			:show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="scroll-box">
-				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" ref="tab" :key="index" :id="`tab_${index}`">
-					<view :animation="animationData[index]" class="title" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
+				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" :id="`tab_${index}`" ref="tab" :key="index" >
+					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
 				</view>
 				<block v-if="type!='default'">
 					<view :class="[type]" :animation="animationSlider" ref="slider" id="slider" :style="sliderBgColor+sliderPosition"></view>
@@ -46,7 +47,11 @@
 			selectColor:{ //选中字体颜色
 				type: String,
 				default: 'black'
-			}
+			},
+			sliderMargin:{ //延长滑块
+				type: Number,
+				default: 20
+			},
 		},
 		data(){
 			return{
@@ -112,13 +117,20 @@
 				if(ratio<0){
 					this.direction = -1
 					this.pos = sysWidth - this.sliderRight
-					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					let yR = Math.abs(yRatio*2)>1?1:yRatio*2
+					let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR)
+					this.sliderAni.width(width).step()
+					
 					this.animationSlider = this.sliderAni.export()
 				}else if(ratio>0){
 					this.direction = 1
 					this.pos = this.sliderLeft
-					this.sliderAni.width(this.sliderWidth+this.sliderMove*Math.abs(dx/sysWidth)).step()
+					let yR = Math.abs(yRatio*2)>1?1:yRatio*2
+					let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR)
+					this.sliderAni.width(width).step()
 					this.animationSlider = this.sliderAni.export()
+				}else{
+					
 				}
 				
 				//取到结果值
@@ -143,14 +155,14 @@
 			async reset(newVal,oldVal){
 				
 				let res = await this.getDataByEl('#scroll-box')
-				
-				let tabData = await this.getDataByEl(`#tab_${this.tabIndex}`)
-			
-				this.sliderLeft = tabData.left - res.left
-				this.sliderRight = tabData.right - res.left
-				this.sliderWidth = tabData.width
+				let tab = await this.getDataByEl(`#tab_${this.tabIndex}`)
+				let tabData = await this.getDataByEl(`#text_${this.tabIndex}`)
+			 
+				this.sliderLeft = tabData.left - res.left - this.sliderMargin/2
+				this.sliderRight = tabData.right - res.left + this.sliderMargin/2
+				this.sliderWidth = tabData.width + this.sliderMargin
 				//滑块移动距离
-				this.sliderMove = (tabData.left-tabData.width*this.tabIndex)/(2*this.tabIndex+1)*2+tabData.width
+				this.sliderMove = tab.width
 				if(oldVal==-1){
 					this.pos = this.sliderLeft
 					return
@@ -158,12 +170,12 @@
 				if(newVal>oldVal){
 					this.direction = -1
 					this.pos = sysWidth - this.sliderRight 
-					this.sliderAniEnd.width(tabData.width).step()
+					this.sliderAniEnd.width(this.sliderWidth).step()
 					this.animationSlider = this.sliderAniEnd.export()
 				}else if(newVal<oldVal){
 					this.direction = 1
 					this.pos = this.sliderLeft
-					this.sliderAniEnd.width(tabData.width).step()
+					this.sliderAniEnd.width(this.sliderWidth).step()
 					this.animationSlider = this.sliderAniEnd.export()
 				}
 					
@@ -197,7 +209,6 @@
 					await this.promise()
 					
 					this.reset(newVal,oldVal)
-					
 				}
 			},
 		},
@@ -225,26 +236,28 @@
 .tab{
 	display: flex;
 	white-space: nowrap;
-
-	padding: 10rpx 20px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 84upx;
+	padding: 0 15px;
 	font-size: 16px;
 	z-index: 99;
 }
 .tab-bar{
-	width: 749rpx;
+	width: 750rpx;
 	height: 84upx;
-	
-
 }
 .tab-box{
 	flex-direction: row;
 	display: flex;
 	position: relative;
 	align-items: center;
+	
 }
 .float{
 	position: absolute;
-	bottom: 0;
+	bottom: 15rpx;
 	
 	height: 20rpx;
 	border-radius: 10rpx;
@@ -252,7 +265,7 @@
 .fill{
 	position: absolute;
 	
-	height: 44rpx;
+	height: 50rpx;
 	border-radius: 20rpx;
 }
 </style>

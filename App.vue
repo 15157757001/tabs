@@ -13,11 +13,13 @@
 </script>
 
 <style>
+	/* #ifndef APP-NVUE */
 	.tab-bar ::-webkit-scrollbar {
-		display: none;
-		width: 0 !important;  
-		height: 0 !important;  
-		-webkit-appearance: none;  
-		background: transparent;  
+	    display: none;  
+	    width: 0 !important;  
+	    height: 0 !important;  
+	    -webkit-appearance: none;  
+	    background: transparent;  
 	}
+	/* #endif */
 </style>
