@@ -18,11 +18,10 @@ components:{clTabs},
 | tabBars | Array | [] | 标题 |
 | tabIndex | Number | -1 | 当前tab索引 |
 | scale | Number | 1 | 放大倍数 |
-| type | String | default | fill包含 float上浮 hang悬空 |
+| type | String | default | fill包含 float上浮 |
 | sliderColor | String | '#ff461f' | 滑块颜色 |
 | textColor | String | 'black' | 所有字体颜色 |
 | selectColor | String | 'black' | 选中字体颜色 |
 | sliderMargin | Number | 20 | 延长滑块长度 px |
-| center | Boolean | false | 标题居中 |
 
 ## 如果觉得插件不错，麻烦给个好评
