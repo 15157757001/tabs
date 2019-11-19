@@ -4,10 +4,10 @@ tab动态字体缩放，动态滑块缩放效果
 
 ## 使用方式
 
-**在index.js中**  
+**在index.vue中**  
 
 ~~~
-import clCardDel from "@/components/cl-tabs/cl-tabs";
+import clTabs from "@/components/cl-tabs/cl-tabs";
 components:{clTabs},
 ~~~
 
