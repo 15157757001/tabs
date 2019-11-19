@@ -32,7 +32,7 @@
 				type: Number,
 				default: 1
 			},
-			type: { //类型fill文字被包含 float文字上浮
+			type: { //类型fill文字被包含 float文字上浮 hang悬空
 				type: String,
 				default: 'default'
 			},
