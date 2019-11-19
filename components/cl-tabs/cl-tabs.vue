@@ -2,7 +2,7 @@
 	<view class="tabs">
 		<scroll-view class="tab-bar" :scroll="false" scroll-x
 			:show-scrollbar="false" :scroll-into-view="scrollInto">
-			<view class="tab-box" id="scroll-box">
+			<view class="tab-box" id="tab-box" :style="{justifyContent: center?'center':'flex-start'}">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" :id="`tab_${index}`" ref="tab" :key="index" >
 					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
 				</view>
@@ -51,6 +51,10 @@
 			sliderMargin:{ //延长滑块
 				type: Number,
 				default: 20
+			},
+			center:{ //居中
+				type: Boolean,
+				default: false
 			},
 		},
 		data(){
@@ -154,7 +158,7 @@
 			},
 			async reset(newVal,oldVal){
 				
-				let res = await this.getDataByEl('#scroll-box')
+				let res = await this.getDataByEl('#tab-box')
 				let tab = await this.getDataByEl(`#tab_${this.tabIndex}`)
 				let tabData = await this.getDataByEl(`#text_${this.tabIndex}`)
 			 
@@ -253,11 +257,10 @@
 	display: flex;
 	position: relative;
 	align-items: center;
-	
 }
 .float{
 	position: absolute;
-	bottom: 15rpx;
+	bottom: 12rpx;
 	
 	height: 20rpx;
 	border-radius: 10rpx;
@@ -267,5 +270,11 @@
 	
 	height: 50rpx;
 	border-radius: 20rpx;
+}
+.hang{
+	bottom: 5rpx;
+	position: absolute;
+	border-radius: 10rpx;
+	height: 10rpx;
 }
 </style>
