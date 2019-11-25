@@ -1,9 +1,11 @@
 <template>
 	<view class="content">
 		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" :sliderMargin="20"
-			type="fill" sliderColor="#E6FAFF" selectColor="#0cC5FD" ref="tabs2" class="tabs">
+			type="fill" sliderColor="#E6FAFF" selectColor="#0cC5FD" ref="tabs0" class="tabs" aniType="extend">
 		</cl-tabs>
-		
+		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" :sliderMargin="20"
+			type="fill" sliderColor="#E6FAFF" selectColor="#0cC5FD" ref="tabs1" class="tabs" aniType="movExtend">
+		</cl-tabs>
 		<swiper 
 			class="swiper" 
 			:duration="300"
@@ -59,9 +61,11 @@
 					
 				}else{
 					if(this.fristTouch){
-						this.$refs.tabs2.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
+						this.$refs.tabs0.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
+						this.$refs.tabs1.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
 					}else{
-						this.$refs.tabs2.move(e.detail.dx)
+						this.$refs.tabs0.move(e.detail.dx)
+						this.$refs.tabs1.move(e.detail.dx)
 					}
 				}
 			},
@@ -79,7 +83,7 @@
 
 .swiper{
 	background-color: #F1F1F1;
-	height: 600px;
+	height: 400px;
 }
 	
 </style>

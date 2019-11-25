@@ -36,6 +36,10 @@
 				type: String,
 				default: 'default'
 			},
+			aniType:{ //动画类型  extend
+				type: String,
+				default: 'default'
+			},
 			sliderColor: { //滑块颜色
 				type: String,
 				default: '#ff461f'
@@ -79,7 +83,7 @@
 			this.largeAni = uni.createAnimation({duration:0});
 			//滑块动画
 			this.sliderAni = uni.createAnimation({duration:0});
-			this.sliderAniEnd = uni.createAnimation({duration:80});
+			this.sliderAniEnd = uni.createAnimation({duration:100});
 		},
 		mounted() {
 			
@@ -115,28 +119,68 @@
 				//计算率
 				let yRatio = dx%sysWidth/sysWidth
 				
-				//两边禁止缩小
+				//两边禁止
 				if(this.tabIndex+ratio>=this.tabBars.length-1||this.tabIndex+ratio<=0) return
 				
-				if(ratio<0){
-					this.direction = -1
-					this.pos = sysWidth - this.sliderRight
-					let yR = Math.abs(yRatio*2)>1?1:yRatio*2
-					let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR)
-					this.sliderAni.width(width).step()
-					
-					this.animationSlider = this.sliderAni.export()
-				}else if(ratio>0){
-					this.direction = 1
-					this.pos = this.sliderLeft
-					let yR = Math.abs(yRatio*2)>1?1:yRatio*2
-					let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR)
-					this.sliderAni.width(width).step()
-					this.animationSlider = this.sliderAni.export()
-				}else{
+				
+				if(this.aniType=='extend'){
+					this.extendAni(ratio,yRatio)
+				}else if(this.aniType=='default'){
+					this.defaultAni(ratio,yRatio)
+				}else if(this.aniType=='movExtend'){
+					this.movExtendAni(ratio,yRatio)
 					
 				}
 				
+				this.textAni(ratio,yRatio)
+				
+				
+				
+			},
+			defaultAni(ratio,yRatio){
+				let yR = Math.abs(yRatio*2)>1?1:yRatio*2
+				let translateX = this.sliderMove * ratio
+				
+				this.sliderAni.translateX(translateX).step()
+				this.animationSlider = this.sliderAni.export()
+				
+			},
+			movExtendAni(ratio,yRatio){
+				let yR = Math.abs(yRatio*2)>1?1:yRatio*2
+				let maxTranslateX = this.sliderMove/2*ratio/Math.abs(ratio)
+				let translateX = Math.abs(this.sliderMove * ratio)>Math.abs(maxTranslateX)?maxTranslateX:this.sliderMove * ratio
+				let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR) - Math.abs(translateX)
+				
+				this.sliderAni.width(width).step()
+				this.animationSlider = this.sliderAni.export()
+				
+				if(width+Math.abs(translateX)>this.sliderWidth+this.sliderMove) return
+				
+				this.sliderAni.translateX(translateX).step()
+				this.animationSlider = this.sliderAni.export()
+				if(ratio<0){
+					this.direction = -1
+					this.pos = sysWidth - this.sliderRight
+				}else if(ratio>0){
+					this.direction = 1
+					this.pos = this.sliderLeft
+				}
+			},
+			extendAni(ratio,yRatio){
+				let yR = Math.abs(yRatio*2)>1?1:yRatio*2
+				let width = this.sliderWidth+this.sliderMove*Math.floor(Math.abs(ratio))+this.sliderMove*Math.abs(yR)
+				if(ratio<0){
+					this.direction = -1
+					this.pos = sysWidth - this.sliderRight
+				}else if(ratio>0){
+					this.direction = 1
+					this.pos = this.sliderLeft
+				}
+
+				this.sliderAni.width(width).step()
+				this.animationSlider = this.sliderAni.export()
+			},
+			textAni(ratio,yRatio){
 				//取到结果值
 				let currentIndex = ratio>0?Math.ceil(this.tabIndex+ratio):Math.floor(this.tabIndex+ratio)
 				
@@ -153,15 +197,40 @@
 					this.largeAni.scale( scale ).step()
 					this.animationData[currentIndex] = this.largeAni.export()
 				}
-				
-				
 			},
 			async reset(newVal,oldVal){
+				if(this.aniType=='movExtend'&&oldVal!=-1){
+					if(newVal>oldVal){
+						this.direction = -1
+						this.pos = sysWidth - this.sliderRight -(newVal-oldVal)*this.sliderMove
+					}else if(newVal<oldVal){
+						this.direction = 1
+						this.pos = this.sliderLeft + (newVal-oldVal)*this.sliderMove
+					}
+					await this.promise()
+					this.sliderAni.width(this.sliderMove/2+this.sliderWidth).translateX(0).step()
+					
+					this.animationSlider = this.sliderAni.export()
+				}else if(this.aniType=='default'&&oldVal!=-1){
+					if(newVal>oldVal){
+						this.direction = -1
+						this.pos = sysWidth - this.sliderRight -(newVal-oldVal)*this.sliderMove
+					}else if(newVal<oldVal){
+						this.direction = 1
+						this.pos = this.sliderLeft + (newVal-oldVal)*this.sliderMove
+					}
+					await this.promise()
+					this.sliderAni.translateX(0).step()
+					
+					this.animationSlider = this.sliderAni.export()
+				}
+				
 				
 				let res = await this.getDataByEl('#tab-box')
 				let tab = await this.getDataByEl(`#tab_${this.tabIndex}`)
 				let tabData = await this.getDataByEl(`#text_${this.tabIndex}`)
-			 
+				
+				
 				this.sliderLeft = tabData.left - res.left - this.sliderMargin/2
 				this.sliderRight = tabData.right - res.left + this.sliderMargin/2
 				this.sliderWidth = tabData.width + this.sliderMargin
@@ -174,14 +243,19 @@
 				if(newVal>oldVal){
 					this.direction = -1
 					this.pos = sysWidth - this.sliderRight 
-					this.sliderAniEnd.width(this.sliderWidth).step()
-					this.animationSlider = this.sliderAniEnd.export()
 				}else if(newVal<oldVal){
 					this.direction = 1
 					this.pos = this.sliderLeft
+				}
+				
+				if(this.aniType=='extend'||this.aniType=='movExtend'){
+					
 					this.sliderAniEnd.width(this.sliderWidth).step()
 					this.animationSlider = this.sliderAniEnd.export()
+				}else if(this.aniType=='default'){
+					
 				}
+				
 					
 					
 			
@@ -222,7 +296,6 @@
 			},
 			sliderPosition(){
 				let pos = this.direction > 0?`left:${this.pos}px;`:`right:${this.pos}px;`
-				
 				return pos
 			}
 		}
