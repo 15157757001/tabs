@@ -81,7 +81,7 @@
 
 .swiper{
 	background-color: #F1F1F1;
-	height: 600px;
+	height: 400px;
 }
 	
 </style>

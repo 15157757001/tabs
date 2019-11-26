@@ -18,7 +18,8 @@ components:{clTabs},
 | tabBars | Array | [] | 标题 |
 | tabIndex | Number | -1 | 当前tab索引 |
 | scale | Number | 1 | 放大倍数 |
-| type | String | default | fill包含 float上浮 hang悬空 |
+| type | String | default | 滑块位置 fill包含 float上浮 hang悬空 |
+| aniType | String | default | 滑块动画效果 extend延长 movExtend拖动延长 |
 | sliderColor | String | '#ff461f' | 滑块颜色 |
 | textColor | String | 'black' | 所有字体颜色 |
 | selectColor | String | 'black' | 选中字体颜色 |
