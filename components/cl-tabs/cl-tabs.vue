@@ -1,10 +1,10 @@
 <template>
 	<view class="tabs">
-		<scroll-view class="tab-bar" :scroll="false" scroll-x
+		<scroll-view class="tab-bar" :scroll="false" scroll-x scroll-with-animation
 			:show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="tab-box" :style="{justifyContent: center?'center':'flex-start'}">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" :id="`tab_${index}`" ref="tab" :key="index" >
-					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor}">{{item}}</view>
+					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor,width:tabWidth}">{{item}}</view>
 				</view>
 				<block v-if="type!='default'">
 					<view :class="[type]" :animation="animationSlider" ref="slider" id="slider" :style="sliderBgColor+sliderPosition"></view>
@@ -54,7 +54,11 @@
 			},
 			sliderMargin:{ //延长滑块
 				type: Number,
-				default: 20
+				default: 0
+			},
+			tabWidth:{ //tab宽度
+				type: String,
+				default: ''
 			},
 			center:{ //居中
 				type: Boolean,
@@ -141,7 +145,7 @@
 				let yR = Math.abs(yRatio*2)>1?1:yRatio*2
 				let translateX = this.sliderMove * ratio
 				
-				this.sliderAni.translateX(translateX).step()
+				this.sliderAni.left(this.sliderLeft + translateX).step()
 				this.animationSlider = this.sliderAni.export()
 				
 			},
@@ -211,18 +215,6 @@
 					this.sliderAni.width(this.sliderMove/2+this.sliderWidth).translateX(0).step()
 					
 					this.animationSlider = this.sliderAni.export()
-				}else if(this.aniType=='default'&&oldVal!=-1){
-					if(newVal>oldVal){
-						this.direction = -1
-						this.pos = sysWidth - this.sliderRight -(newVal-oldVal)*this.sliderMove
-					}else if(newVal<oldVal){
-						this.direction = 1
-						this.pos = this.sliderLeft + (newVal-oldVal)*this.sliderMove
-					}
-					await this.promise()
-					this.sliderAni.translateX(0).step()
-					
-					this.animationSlider = this.sliderAni.export()
 				}
 				
 				
@@ -236,24 +228,27 @@
 				this.sliderWidth = tabData.width + this.sliderMargin
 				//滑块移动距离
 				this.sliderMove = tab.width
-				if(oldVal==-1){
-					this.pos = this.sliderLeft
-					return
-				}
-				if(newVal>oldVal){
-					this.direction = -1
-					this.pos = sysWidth - this.sliderRight 
-				}else if(newVal<oldVal){
-					this.direction = 1
-					this.pos = this.sliderLeft
-				}
+	
 				
-				if(this.aniType=='extend'||this.aniType=='movExtend'){
-					
+				if(this.aniType=='default'){
+					await this.promise()
+					this.sliderAni.left(this.sliderLeft).step()
+					this.animationSlider = this.sliderAni.export()
+				}else if(this.aniType=='extend'||this.aniType=='movExtend'){
+					if(oldVal==-1){
+						this.pos = this.sliderLeft
+						return
+					}
+					if(newVal>oldVal){
+						this.direction = -1
+						this.pos = sysWidth - this.sliderRight 
+					}else if(newVal<oldVal){
+						this.direction = 1
+						this.pos = this.sliderLeft
+					}
+			
 					this.sliderAniEnd.width(this.sliderWidth).step()
 					this.animationSlider = this.sliderAniEnd.export()
-				}else if(this.aniType=='default'){
-					
 				}
 				
 					
@@ -274,7 +269,7 @@
 			},
 			tabIndex:{
 				handler:async function(newVal,oldVal){
-					this.scrollInto = `tab_${newVal}`
+					
 					for (let key in this.animationData) {
 						if(key!=this.tabIndex){
 							this.largeAni.scale( 1 ).step()
@@ -287,6 +282,9 @@
 					await this.promise()
 					
 					this.reset(newVal,oldVal)
+					await this.promise(250)
+					let scrollTab = newVal-2>0?newVal-2:0
+					this.scrollInto = `tab_${scrollTab}`
 				}
 			},
 		},
@@ -296,6 +294,7 @@
 			},
 			sliderPosition(){
 				let pos = this.direction > 0?`left:${this.pos}px;`:`right:${this.pos}px;`
+				if(this.aniType=='default') pos=''
 				return pos
 			}
 		}
@@ -317,9 +316,12 @@
 	align-items: center;
 	justify-content: center;
 	height: 84upx;
-	padding: 0 15px;
+	padding: 0 30rpx;
 	font-size: 16px;
 	z-index: 99;
+}
+.title{
+	text-align: center;
 }
 .tab-bar{
 	width: 750rpx;

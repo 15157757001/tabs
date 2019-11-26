@@ -1,7 +1,9 @@
 <template>
 	<view class="content">
 		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" center aniType="extend"
-			type="hang" sliderColor="#FF6F00" textColor="#939393" selectColor="black" ref="tabs2" class="tabs">
+			type="hang" sliderColor="#FF6F00" textColor="#939393" selectColor="black" ref="tabs2" class="tabs"
+			:sliderMargin="20" 
+			>
 		</cl-tabs>
 		
 		<swiper 

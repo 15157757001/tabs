@@ -1,9 +1,9 @@
 <template>
 	<view class="content">
-		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" 
+		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" tabWidth="60px"
 			:scale="1.3" sliderColor="#faff72" type="float" ref="tabs0" aniType="extend">
 		</cl-tabs>
-		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange"
+		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange" tabWidth="60px"
 			:scale="1.3" aniType="default" sliderColor="#faff72" type="float" ref="tabs1">
 		</cl-tabs>
 		
@@ -30,7 +30,7 @@
 		},
 		data() {
 			return {
-				tabBars:['最新','新闻','图片','视频','推荐','收藏','关注'],
+				tabBars:['最新','新闻','看一看','成语接龙','推荐','收藏','关注'],
 				tabCurrentIndex:-1,
 				sysWidth:0,
 				source:'touch',

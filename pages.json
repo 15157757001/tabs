@@ -35,12 +35,6 @@
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	},
 	"tabBar": {
 		"color": "#333333",
 		"backgroundColor": "#F8F8F8",
@@ -52,7 +46,7 @@
 			},
 			{
 				"pagePath": "pages/index1/index",
-				"text": "上浮"
+				"text": "定宽上浮"
 			},
 			{
 				"pagePath": "pages/index2/index",
