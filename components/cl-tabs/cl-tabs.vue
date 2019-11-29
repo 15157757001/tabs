@@ -4,7 +4,7 @@
 			:show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="tab-box" :style="{justifyContent: center?'center':'flex-start'}">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" :id="`tab_${index}`" ref="tab" :key="index" >
-					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor,width:tabWidth}">{{item}}</view>
+					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor,width:tabWidth}">{{item.tab||item}}</view>
 				</view>
 				<block v-if="type!='default'">
 					<view :class="[type]" :animation="animationSlider" ref="slider" id="slider" :style="sliderBgColor+sliderPosition"></view>
@@ -306,7 +306,7 @@
 	width: 750rpx;
 	display: flex;
 	flex-direction: row;
-	padding: 20rpx 0;
+	padding: 0 0;
 	align-items: center;
 }
 .tab{
@@ -315,7 +315,7 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	height: 84upx;
+	height: 44px;
 	padding: 0 30rpx;
 	font-size: 16px;
 	z-index: 99;
@@ -325,7 +325,7 @@
 }
 .tab-bar{
 	width: 750rpx;
-	height: 84upx;
+	height: 44px;
 }
 .tab-box{
 	flex-direction: row;
@@ -335,7 +335,7 @@
 }
 .float{
 	position: absolute;
-	bottom: 12rpx;
+	bottom: 6px;
 	
 	height: 20rpx;
 	border-radius: 10rpx;
@@ -343,13 +343,13 @@
 .fill{
 	position: absolute;
 	
-	height: 50rpx;
+	height: 25px;
 	border-radius: 20rpx;
 }
 .hang{
-	bottom: 5rpx;
+	bottom: 3px;
 	position: absolute;
 	border-radius: 10rpx;
-	height: 10rpx;
+	height: 5px;
 }
 </style>

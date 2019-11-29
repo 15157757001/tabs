@@ -8,24 +8,37 @@
 			}
 		},
 		{
-			"path": "pages/index1/index",
+			"path": "pages/index/default/default",
 			"style": {
 				"navigationBarTitleText": "uni-app"
 				
 			}
 		},
 		{
-			"path": "pages/index2/index",
+			"path": "pages/index/float/float",
 			"style": {
 				"navigationBarTitleText": "uni-app"
 				
 			}
 		},
 		{
-			"path": "pages/index3/index",
+			"path": "pages/index/fill/fill",
 			"style": {
 				"navigationBarTitleText": "uni-app"
 				
+			}
+		},
+		{
+			"path": "pages/index/hang/hang",
+			"style": {
+				"navigationBarTitleText": "uni-app"
+				
+			}
+		},
+		{
+			"path": "pages/index/sticky/sticky",
+			"style": {
+				"navigationBarTitleText": "uni-app"
 			}
 		}
 	],
@@ -34,28 +47,16 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
-	},
-	"tabBar": {
-		"color": "#333333",
-		"backgroundColor": "#F8F8F8",
-		"selectedColor": "#00B26A",
-		"list": [
-			{
-				"pagePath": "pages/index/index",
-				"text": "默认"
-			},
-			{
-				"pagePath": "pages/index1/index",
-				"text": "定宽上浮"
-			},
-			{
-				"pagePath": "pages/index2/index",
-				"text": "吞噬"
-			},
-			{
-				"pagePath": "pages/index3/index",
-				"text": "悬空"
-			}
-		]
 	}
+	// "tabBar": {
+	// 	"color": "#333333",
+	// 	"backgroundColor": "#F8F8F8",
+	// 	"selectedColor": "#00B26A",
+	// 	"list": [
+	// 		{
+	// 			"pagePath": "pages/index/index",
+	// 			"text": "tabs"
+	// 		}
+	// 	]
+	// }
 }

@@ -1,87 +1,41 @@
 <template>
-	<view class="content">
-		
-		<cl-tabs :tab-bars="tabBars" :tab-index="tabCurrentIndex" @tabChange="tabChange"
-			:scale="1.3" ref="tabs0">
-		</cl-tabs>
-		
-		
-		<swiper 
-			class="swiper" 
-			:duration="300"
-			@transition="transition"
-			@change="changeCurrent" 
-			:current="tabCurrentIndex"
-			@animationfinish="animationfinish">
-			
-			<swiper-item v-for="(item,index) in tabBars" :key="index">
-				{{index}}
-			</swiper-item>
-		</swiper>
+	<view class="page">
+		<view class="box" @tap="tapBox('default')">默认 <text>></text></view>
+		<view class="box" @tap="tapBox('float')">上浮定宽 <text>></text></view>
+		<view class="box" @tap="tapBox('fill')">包含 <text>></text></view>
+		<view class="box" @tap="tapBox('hang')">悬浮居中 <text>></text></view>
+		<view class="box" @tap="tapBox('sticky')">吸顶(tabs+swiper+scrollView) <text>></text></view>
 	</view>
 </template>
 
 <script>
-	import clTabs from '@/components/cl-tabs/cl-tabs.vue'
-	export default {
-		components:{
-			clTabs
+	export default{
+		data(){
+			return{}
 		},
-		data() {
-			return {
-				tabBars:['最新','新闻','图片','视频','推荐','收藏','关注'],
-				tabCurrentIndex:-1,
-				sysWidth:0,
-				source:'touch',
-				fristTouch:false
-			}
-		},
-		onLoad() {
-			this.sysWidth = uni.getSystemInfoSync().screenWidth
-			//#ifndef H5
-			this.fristTouch = true
-			//#endif
-		},
-		mounted() {
-			
-			this.tabCurrentIndex = 0
-		},
-		methods: {
-			tabChange(e){
-				
-				this.tabCurrentIndex = e
-				
-			},
-			changeCurrent(e){
-				this.source = e.detail.source
-				
-			},
-			transition(e){
-				if(this.source==''){
-					
-				}else{
-					if(this.fristTouch){
-						this.$refs.tabs0.move(e.detail.dx-this.tabCurrentIndex*this.sysWidth)
-					}else{
-						this.$refs.tabs0.move(e.detail.dx)
-					}
-				}
-			},
-			animationfinish(e){
-				
-				this.fristTouch = false
-				this.source = 'touch'
-				this.tabCurrentIndex = e.detail.current
+		methods:{
+			tapBox(urlName){
+				uni.navigateTo({
+					url:`${urlName}/${urlName}`
+				})
 			}
 		}
 	}
 </script>
 
-<style scoped>
-
-.swiper{
-	background-color: #F1F1F1;
-	height: 400px;
-}
-	
+<style>
+	.page{
+		display: flex;
+		flex-direction: column;
+	}
+	.box{
+		flex: 1;
+		
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20rpx 20rpx;
+		border-bottom: 1px solid #ccc;
+	}
 </style>
