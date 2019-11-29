@@ -20,7 +20,7 @@
 			@animationfinish="animationfinish">
 			
 			<swiper-item v-for="(item,index) in tabBars" :key="index">
-				<scroll-view scroll-y :scroll-top="scrollTop" class="scroll-Y tab-bar" @scroll="stickScroll($event,index)" :upper-threshold="10" @scrolltoupper="scrolltoupper($event,index)">
+				<scroll-view scroll-y :scroll-top="scrollTop" class="scroll-Y tab-bar" @scroll="stickScroll($event,index)" :upper-threshold="1" @scrolltoupper="scrolltoupper($event,index)">
 					<view style="height:40px"></view>
 					<view class="scroll-box" v-for="count in 30" :key="count">{{count}}</view>
 				</scroll-view>
@@ -40,11 +40,11 @@
 		data() {
 			return {
 				tabBars:[
-					{tab:'商品',scroll:0},
-					{tab:'商品',scroll:0},
-					{tab:'商品',scroll:0},
-					{tab:'商品',scroll:0},
-					{tab:'商品',scroll:0},
+					{tab:'关注',scroll:0},
+					{tab:'关注',scroll:0},
+					{tab:'关注',scroll:0},
+					{tab:'关注',scroll:0},
+					{tab:'关注',scroll:0},
 				],
 				tabCurrentIndex:-1
 			}
