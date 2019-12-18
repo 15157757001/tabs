@@ -8,6 +8,14 @@
 			}
 		},
 		{
+			"path": "pages/weibo/index",
+			"style": {
+				"navigationBarTitleText": "uni-app",
+				"navigationBarBackgroundColor":"#FAFAFA"
+				
+			}
+		},
+		{
 			"path": "pages/index/default/default",
 			"style": {
 				"navigationBarTitleText": "uni-app"
@@ -47,16 +55,20 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#333333",
+		"backgroundColor": "#F8F8F8",
+		"selectedColor": "#00B26A",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "tabs"
+			},
+			{
+				"pagePath": "pages/weibo/index",
+				"text": "微博"
+			}
+		]
 	}
-	// "tabBar": {
-	// 	"color": "#333333",
-	// 	"backgroundColor": "#F8F8F8",
-	// 	"selectedColor": "#00B26A",
-	// 	"list": [
-	// 		{
-	// 			"pagePath": "pages/index/index",
-	// 			"text": "tabs"
-	// 		}
-	// 	]
-	// }
 }

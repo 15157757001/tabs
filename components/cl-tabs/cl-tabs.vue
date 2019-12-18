@@ -1,5 +1,5 @@
 <template>
-	<view class="tabs">
+	<view class="tabs" :style="{backgroundColor:backgroundColor}">
 		<scroll-view class="tab-bar" :scroll="false" scroll-x scroll-with-animation
 			:show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="tab-box" :style="{justifyContent: center?'center':'flex-start'}">
@@ -64,6 +64,10 @@
 				type: Boolean,
 				default: false
 			},
+			backgroundColor:{ //tabs背景
+				type: String,
+				default: '#fff'
+			},
 		},
 		data(){
 			return{
@@ -78,7 +82,8 @@
 				sliderMove:0,//滑块移动距离
 				scrollInto:'',
 				pos:0,
-				direction:1
+				direction:1,
+				tapChange: false
 			}
 		},
 		created() {
@@ -113,6 +118,7 @@
 			},
 			//点击
 			async tapTab(index){
+				this.tapChange = true
 				this.$emit('tabChange',index)
 			},
 			//触摸
@@ -212,8 +218,10 @@
 						this.pos = this.sliderLeft + (newVal-oldVal)*this.sliderMove
 					}
 					await this.promise()
-					this.sliderAni.width(this.sliderMove/2+this.sliderWidth).translateX(0).step()
-					
+					if(!this.tapChange){
+						this.sliderAni.width(this.sliderMove/2+this.sliderWidth).translateX(0).step()
+					}
+					this.tapChange = false
 					this.animationSlider = this.sliderAni.export()
 				}
 				
@@ -308,6 +316,7 @@
 	flex-direction: row;
 	padding: 0 0;
 	align-items: center;
+	
 }
 .tab{
 	display: flex;

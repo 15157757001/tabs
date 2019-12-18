@@ -11,13 +11,16 @@
 <script>
 	export default{
 		data(){
-			return{}
+			return{
+				number:5
+			}
 		},
 		methods:{
 			tapBox(urlName){
 				uni.navigateTo({
 					url:`${urlName}/${urlName}`
 				})
+				
 			}
 		}
 	}
