@@ -4,7 +4,7 @@
 			:show-scrollbar="false" :scroll-into-view="scrollInto">
 			<view class="tab-box" id="tab-box" :style="{justifyContent: center?'center':'flex-start'}">
 				<view v-for="(item,index) in tabBars" class="tab" @tap="tapTab(index)" :id="`tab_${index}`" ref="tab" :key="index" >
-					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor,width:tabWidth}">{{item.tab||item}}</view>
+					<view :animation="animationData[index]" class="title" :id="`text_${index}`" :style="{color:index==tabIndex?selectColor:textColor,width:tabWidth,fontSize:`${fontSize}px`}">{{item.tab||item}}</view>
 				</view>
 				<block v-if="type!='default'">
 					<view :class="[type]" :animation="animationSlider" ref="slider" id="slider" :style="sliderBgColor+sliderPosition"></view>
@@ -68,6 +68,10 @@
 				type: String,
 				default: '#fff'
 			},
+			fontSize:{ //字体大小
+				type: Number,
+				default: 12
+			}
 		},
 		data(){
 			return{
