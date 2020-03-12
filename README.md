@@ -26,5 +26,6 @@ components:{clTabs},
 | sliderMargin | Number | 20 | 延长滑块长度 px |
 | center | Boolean | false | 居中 |
 | tabWidth | String | '' | tab宽度 |
+| fontSize | Number | 12 | 字体大小 |
 
 ## 如果觉得插件不错，麻烦给个好评
